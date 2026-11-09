@@ -41,3 +41,4 @@ commentaire à côté du code.
 | [0008](0008-flex-consumption-et-bicep.md) | Phase 2 : plan Flex Consumption et infrastructure en Bicep | Acceptée | 2026-11-09 |
 | [0009](0009-flux-rss-prive-par-cle.md) | Flux RSS privé servi par une Function HTTP avec clé | Proposée | 2026-11-09 |
 | [0010](0010-source-des-mails-en-phase-2.md) | Source des mails en phase 2 : API Gmail ou transfert vers un webhook | Proposée | 2026-11-09 |
+| [0011](0011-version-majeure-alignee-sur-dotnet.md) | Version majeure alignée sur .NET, puis SemVer avec Versionize | Acceptée | 2026-11-09 |

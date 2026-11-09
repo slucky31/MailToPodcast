@@ -70,6 +70,7 @@ Enforced via `.editorconfig`:
 - PR titles must start with `feat` or `fix` (enforced by `.github/semantic.yml`)
 - Branch names are explicit: `<type>/<issue>-<short-kebab-summary>`, one branch and one PR per issue
 - Never stack PRs: branch from `main` only
+- Versioning: `<Version>` in `Directory.Build.props` is bumped only by Versionize in the CD workflow. The major is the .NET major version (10.x.y for net10.0): never use `feat!` or `BREAKING CHANGE` (ADR-0011)
 - Never commit secrets: use user secrets locally, Key Vault in Azure
 
 ## Code Quality Rules
