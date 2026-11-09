@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MailToPodcast.Cli/MailToPodcast.Cli.csproj" />
+    <Project Path="src/MailToPodcast.Core/MailToPodcast.Core.csproj" />
+    <Project Path="src/MailToPodcast.Infrastructure/MailToPodcast.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MailToPodcast.Core.Tests/MailToPodcast.Core.Tests.csproj" />
+    <Project Path="tests/MailToPodcast.Infrastructure.Tests/MailToPodcast.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>
