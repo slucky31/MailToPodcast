@@ -385,11 +385,17 @@ dotnet_diagnostic.IDE0305.severity = none
 
 [tests/**/*.cs]
 
+# Test methods describe a behaviour (Method_Should_X_WhenY), they do not take the Async suffix
+dotnet_diagnostic.IDE1006.severity = none
+
 # Allow underscores in test method names
 dotnet_diagnostic.CA1707.severity = none
 
 # Allow multiple assertions per test
 dotnet_diagnostic.xUnit2013.severity = none
+
+# NSubstitute verifications (Received / DidNotReceive) take a CancellationToken matcher, not a live token
+dotnet_diagnostic.xUnit1051.severity = none
 
 # Relax naming rules for test classes
 dotnet_naming_rule.private_fields_should_be_camelcase_with_underscore.severity = suggestion
