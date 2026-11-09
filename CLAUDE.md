@@ -7,6 +7,10 @@ MailToPodcast turns newsletters received by mail into podcast episodes: HTML cle
 - **Phase 1 (current):** `MailToPodcast.Cli` reads `.eml` files and writes the MP3 and its script into a local folder.
 - **Phase 2 (planned):** an Azure Function (isolated, Flex Consumption, timer every 5 min) reads Gmail mails labelled « À écouter », relabels them « Envoyé en podcast », uploads the MP3 to Blob Storage and updates a private RSS `feed.xml`. Secrets in Key Vault, infrastructure in Bicep.
 
+## Architecture Decision Records
+
+Structuring decisions live in `docs/adr/` (index in `docs/adr/README.md`, template in `docs/adr/template.md`). Read the relevant ADRs before changing an architectural choice; record a new decision as a new ADR (`docs(adr): ...`) and never rewrite an Accepted one: supersede it.
+
 ## Build & Development Commands
 
 ```bash
