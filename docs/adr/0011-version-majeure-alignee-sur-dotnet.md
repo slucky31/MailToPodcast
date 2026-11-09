@@ -49,9 +49,10 @@ n'est pas protégée.
 ## Conséquences
 
 - **Positives** : version, tag, changelog et release GitHub sans geste manuel ;
-  la majeure dit sur quelle version de .NET tourne l'application.
-- **Négatives** : la première release après le merge de la phase 1 sera
-  `10.1.0` (un `feat` depuis `10.0.0`) ; `CHANGELOG.md` est committé et peut
+  la majeure dit sur quelle version de .NET tourne l'application. Sans tag
+  existant, Versionize publie la version courante : la première release après
+  le merge de la phase 1 est `v10.0.0`, la suivante `10.1.0` ou `10.0.1`.
+- **Négatives** : `CHANGELOG.md` est committé et peut
   entrer en conflit si deux releases se croisent (non attendu en
   mono-mainteneur).
 - **Projets impactés** : tous (version partagée), `.github/workflows/cd.yml`
