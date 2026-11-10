@@ -13,7 +13,7 @@ concurrency:
 jobs:
   build:
     name: Build & Test
-    # The release job pushes a "chore(release): x.y.z" commit, which re-triggers this workflow:
+    # The release job pushes a "chore(release): 10.x.y.z" commit, which re-triggers this workflow:
     # that commit only bumps the version and the changelog, so it is skipped.
     if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
     runs-on: ubuntu-latest
@@ -112,10 +112,21 @@ jobs:
         if: steps.main-head.outputs.current == 'true'
         run: dotnet tool install --global Versionize
 
-      # Pins the x.y.z part the build job computed; the tag gets the .NET prefix.
+      # Pins the x.y.z part the build job computed. Versionize bumps <Version> and writes
+      # CHANGELOG.md only: the changelog heading, the release commit and the tag are then
+      # given the full product version 10.x.y.z (ADR-0011).
       - name: Versioning
         if: steps.main-head.outputs.current == 'true'
-        run: versionize --release-as "${{ needs.build.outputs.semver }}" --tag-template "${{ needs.build.outputs.tag_template }}"
+        env:
+          SEMVER: ${{ needs.build.outputs.semver }}
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          versionize --release-as "$SEMVER" --tag-template "${{ needs.build.outputs.tag_template }}" --skip-commit --skip-tag
+          escaped=$(echo "$SEMVER" | sed 's/\./\\./g')
+          sed -i -E "s/^<a name=\"$escaped\"><\/a>/<a name=\"$VERSION\"><\/a>/; s/^## (\[?)$escaped([] ])/## \1$VERSION\2/" CHANGELOG.md
+          git add Directory.Build.props CHANGELOG.md
+          git commit -m "chore(release): $VERSION"
+          git tag -a "v$VERSION" -m "chore(release): $VERSION"
 
       # Never forced: if main moved in the meantime, the push fails instead of dropping a merge.
       - name: Push release commit and tag
