@@ -1,44 +1,53 @@
-# ADR-0011: Version majeure alignée sur .NET, puis SemVer avec Versionize
+# ADR-0011: Préfixe .NET devant une version SemVer (10.x.y.z) avec Versionize
 
 **Statut** : Acceptée
-**Date** : 2026-11-09
+**Date** : 2026-11-10
 **Décideurs** : @slucky31
 
 ## Contexte
 
 Le projet a besoin d'un numéro de version, d'un tag et d'un changelog à chaque
-mise en production, sans étape manuelle. Comme MyComicsManager (10.x.y), le
-numéro de version majeure doit indiquer la version de .NET ciblée : la solution
-est en `net10.0`, donc les versions commencent par `10`.
+mise en production, sans étape manuelle. Le numéro doit indiquer la version de
+.NET ciblée (`net10.0` → `10`), sans renoncer au fonctionnement normal de
+SemVer : un changement incompatible doit pouvoir monter la majeure.
 
 ## Options considérées
 
-- **Option A — SemVer pur (1.0.0, puis majeure à chaque changement incompatible)**
-  - Contre : la majeure ne dit plus rien de la plateforme ; diverge de MyComicsManager.
-- **Option B — Majeure = version de .NET, mineure et correctif en SemVer, calculés par Versionize (retenue)**
-  - Pour : même mécanisme que MyComicsManager (ADR-0018 de ce projet-là) ;
-    `feat` → mineure, `fix` → correctif, calculés depuis les titres de PR
-    (squash-merge) déjà validés par `.github/semantic.yml`.
-  - Contre : un changement incompatible ne peut pas monter la majeure ; il
-    passe en mineure.
+- **Option A — SemVer pur (1.0.0)**
+  - Contre : la version ne dit plus rien de la plateforme.
+- **Option B — Majeure = version de .NET, puis mineure et correctif (10.x.y)**
+  - Pour : même schéma que MyComicsManager.
+  - Contre : un changement incompatible ne peut pas monter la majeure ; il faut
+    interdire `feat!` et `BREAKING CHANGE`.
+- **Option C — Préfixe .NET suivi d'une version SemVer complète (10.x.y.z) (retenue)**
+  - Pour : `x.y.z` suit SemVer sans exception (`feat!`/`BREAKING CHANGE` → `x`,
+    `feat` → `y`, `fix` → `z`), calculé par Versionize depuis les titres de PR
+    (squash-merge) validés par `.github/semantic.yml` ; le préfixe donne la
+    version de .NET. Le format à quatre nombres est aussi celui de
+    `AssemblyVersion`/`FileVersion`.
+  - Contre : ce n'est plus une chaîne SemVer stricte (quatre nombres) ; le
+    préfixe est ajouté par le build et par le modèle de tag, pas par Versionize.
 
 ## Décision
 
-On retient **Option B** :
+On retient **Option C** :
 
-- source unique : `<Version>` dans `Directory.Build.props`, point de départ `10.0.0` ;
+- `Directory.Build.props` porte `<DotNetMajor>10</DotNetMajor>` (qui donne aussi
+  `TargetFramework` = `net$(DotNetMajor).0`) et `<Version>` = partie SemVer
+  `x.y.z`, seule valeur lue et modifiée par Versionize. Les versions
+  d'assembly, de fichier et informative valent `$(DotNetMajor).$(Version)` ;
 - le workflow `CD` (push sur `main`) calcule la version suivante avec
-  `versionize --dry-run --exit-insignificant-commits`, build et teste, puis le
-  job `release` committe `chore(release): x.y.z` (version et `CHANGELOG.md`),
-  pose le tag `vx.y.z` et crée la release GitHub ;
+  `versionize --dry-run --exit-insignificant-commits --tag-template "v10.{version}"`,
+  build et teste, puis le job `release` committe `chore(release): x.y.z`
+  (version et `CHANGELOG.md`), pose le tag `v10.x.y.z` et crée la release
+  GitHub `v10.x.y.z` ;
 - un commit `chore`, `docs`, `ci` ne déclenche pas de release, sans faire
   échouer le run ;
-- garde-fou : le run échoue si la version calculée ne commence pas par la
-  majeure de `TargetFramework` (un `feat!` ou un `BREAKING CHANGE` monterait
-  la majeure). Ne pas utiliser ces marqueurs ;
 - passage à une nouvelle version de .NET (ex. `net11.0`) : changer
-  `TargetFramework`, puis publier à la main la nouvelle majeure avec
-  `versionize --release-as 11.0.0`.
+  `DotNetMajor`. Le modèle de tag devient `v11.{version}` : aucun tag existant
+  ne correspond, Versionize repart de la `<Version>` courante, publiée sous
+  `v11.x.y.z`. Remettre `<Version>` à `1.0.0` dans la même PR si l'on veut
+  repartir de `v11.1.0.0`.
 
 Comme dans MyComicsManager, si `main` est protégée, le push du commit de
 release demande un secret `RELEASE_TOKEN` (PAT classique d'un compte admin,
@@ -49,12 +58,14 @@ n'est pas protégée.
 ## Conséquences
 
 - **Positives** : version, tag, changelog et release GitHub sans geste manuel ;
-  la majeure dit sur quelle version de .NET tourne l'application. Sans tag
-  existant, Versionize publie la version courante : la première release après
-  le merge de la phase 1 est `v10.0.0`, la suivante `10.1.0` ou `10.0.1`.
-- **Négatives** : `CHANGELOG.md` est committé et peut
-  entrer en conflit si deux releases se croisent (non attendu en
-  mono-mainteneur).
+  le préfixe dit sur quelle version de .NET tourne l'application et `x.y.z`
+  garde le sens habituel de SemVer. Sans tag existant, Versionize publie la
+  version courante : la première release après le merge de la phase 1 est
+  `v10.1.0.0`, la suivante `v10.1.1.0` (`feat`), `v10.1.0.1` (`fix`) ou
+  `v10.2.0.0` (changement incompatible).
+- **Négatives** : `CHANGELOG.md` et le commit de release affichent `x.y.z` sans
+  le préfixe ; `CHANGELOG.md` est committé et peut entrer en conflit si deux
+  releases se croisent (non attendu en mono-mainteneur).
 - **Projets impactés** : tous (version partagée), `.github/workflows/cd.yml`
 
 ## Liens

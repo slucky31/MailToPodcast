@@ -1,9 +1,14 @@
 <Project>
   <PropertyGroup>
-    <!-- Single source of truth for the version, updated by Versionize in the CD release job.
-         The major is the .NET major version (net10.0 -> 10.x.y), then SemVer: see docs/adr/0011. -->
-    <Version>10.0.0</Version>
-    <TargetFramework>net10.0</TargetFramework>
+    <!-- Product version: 10.x.y.z, where 10 is the .NET major version and x.y.z follows SemVer (ADR-0011).
+         Versionize only reads and bumps <Version> (the x.y.z part) in the CD release job; never edit it by hand.
+         On a .NET upgrade, change DotNetMajor along with TargetFramework. -->
+    <DotNetMajor>10</DotNetMajor>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>$(DotNetMajor).$(Version)</AssemblyVersion>
+    <FileVersion>$(DotNetMajor).$(Version)</FileVersion>
+    <InformationalVersion>$(DotNetMajor).$(Version)</InformationalVersion>
+    <TargetFramework>net$(DotNetMajor).0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AnalysisLevel>latest</AnalysisLevel>
