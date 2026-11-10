@@ -38,9 +38,11 @@ On retient **Option C** :
   d'assembly, de fichier et informative valent `$(DotNetMajor).$(Version)` ;
 - le workflow `CD` (push sur `main`) calcule la version suivante avec
   `versionize --dry-run --exit-insignificant-commits --tag-template "v10.{version}"`,
-  build et teste, puis le job `release` committe `chore(release): x.y.z`
-  (version et `CHANGELOG.md`), pose le tag `v10.x.y.z` et crée la release
-  GitHub `v10.x.y.z` ;
+  build et teste, puis le job `release` lance Versionize sans commit ni tag
+  (`--skip-commit --skip-tag`, il ne fait que monter `<Version>` et écrire
+  `CHANGELOG.md`), remplace `x.y.z` par `10.x.y.z` dans le titre de la section
+  ajoutée au changelog, committe `chore(release): 10.x.y.z`, pose le tag
+  `v10.x.y.z` et crée la release GitHub `v10.x.y.z` ;
 - un commit `chore`, `docs`, `ci` ne déclenche pas de release, sans faire
   échouer le run ;
 - passage à une nouvelle version de .NET (ex. `net11.0`) : changer
@@ -63,8 +65,10 @@ n'est pas protégée.
   version courante : la première release après le merge de la phase 1 est
   `v10.1.0.0`, la suivante `v10.1.1.0` (`feat`), `v10.1.0.1` (`fix`) ou
   `v10.2.0.0` (changement incompatible).
-- **Négatives** : `CHANGELOG.md` et le commit de release affichent `x.y.z` sans
-  le préfixe ; `CHANGELOG.md` est committé et peut entrer en conflit si deux
+- **Négatives** : le commit, le tag et le titre du changelog sont écrits par le
+  workflow et non par Versionize (une montée de version de Versionize qui
+  changerait le format du titre laisserait `x.y.z` dans le changelog, sans
+  casser la release) ; `CHANGELOG.md` est committé et peut entrer en conflit si deux
   releases se croisent (non attendu en mono-mainteneur).
 - **Projets impactés** : tous (version partagée), `.github/workflows/cd.yml`
 
