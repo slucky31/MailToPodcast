@@ -1,0 +1,55 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":label(renovate)",
+    ":separateMultipleMajorReleases",
+    ":semanticCommitTypeAll(fix)"
+  ],
+  "prConcurrentLimit": 10,
+  "baseBranchPatterns": [
+    "main"
+  ],
+  "timezone": "Europe/Paris",
+  "schedule": [
+    "* 0-6 * * 1"
+  ],
+  "packageRules": [
+    {
+      "description": "Filet : toutes les autres mises à jour NuGet mineures/patch dans une seule PR",
+      "matchManagers": ["nuget"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "NuGet (autres)"
+    },
+    {
+      "description": ".NET et Microsoft.Extensions",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["Microsoft.*"],
+      "groupName": ".NET"
+    },
+    {
+      "description": "SDK Claude et Azure Speech : changements d'API possibles, à tester à part",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["Anthropic", "Microsoft.CognitiveServices.Speech"],
+      "groupName": "SDK Claude et Speech"
+    },
+    {
+      "description": "Tests et analyseurs (aucun impact sur le code livré)",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "xunit*",
+        "NSubstitute*",
+        "AwesomeAssertions",
+        "Microsoft.NET.Test.Sdk",
+        "Microsoft.Testing.*"
+      ],
+      "groupName": "Tests et analyseurs"
+    },
+    {
+      "description": "GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "GitHub Actions"
+    }
+  ]
+}

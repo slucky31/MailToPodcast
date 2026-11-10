@@ -1,0 +1,29 @@
+ci/cd:
+  - any:
+    - changed-files:
+      - any-glob-to-any-file: '.github/**'
+
+docs:
+  - any:
+    - changed-files:
+      - any-glob-to-any-file: '**/*.md'
+
+test:
+  - any:
+    - changed-files:
+      - any-glob-to-any-file: 'tests/**'
+
+core:
+  - any:
+    - changed-files:
+      - any-glob-to-any-file: 'src/MailToPodcast.Core/**'
+
+infra:
+  - any:
+    - changed-files:
+      - any-glob-to-any-file: 'src/MailToPodcast.Infrastructure/**'
+
+cli:
+  - any:
+    - changed-files:
+      - any-glob-to-any-file: 'src/MailToPodcast.Cli/**'
